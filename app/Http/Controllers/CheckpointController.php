@@ -11,8 +11,11 @@ class CheckpointController extends Controller
 {
     public function index()
     {
-        // Get all checkpoints sorted by the most recent
-        $checkpoints = Checkpoint::latest()->get();
+        $uid = request('uid'); // maybe passed from query or session
+
+    $checkpoints = Checkpoint::when($uid, function($query, $uid) {
+        return $query->where('uid', $uid);
+    })->latest()->get();
         
         // Return the checkpoints index view
         return view('checkpoints.index', compact('checkpoints'));

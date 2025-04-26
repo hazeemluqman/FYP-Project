@@ -1,22 +1,27 @@
 <?php
 
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\CheckpointController;
-use App\Http\Controllers\CheckpointPassController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\RfidController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RfidController;
+use App\Http\Controllers\CheckpointController;
+use App\Http\Controllers\ActivityController;
+use Illuminate\Support\Facades\Auth;
 
 // Show welcome page
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome2');
 });
 
-
-// No auth middleware, anyone can access these routes now
-Route::resource('/rfids', RfidController::class);
-Route::resource('/checkpoints', CheckpointController::class);
-Route::resource('/activities', ActivityController::class);
+// Authentication routes
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Redirect /home to /checkpoints
+Route::get('/home', function () {
+    return redirect('/checkpoints');
+})->name('home');
+
+// Protected routes - only accessible to logged-in users
+Route::middleware(['auth'])->group(function () {
+    Route::resource('/rfids', RfidController::class);
+    Route::resource('/checkpoints', CheckpointController::class);
+    Route::resource('/activities', ActivityController::class);
+});

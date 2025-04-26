@@ -3,9 +3,9 @@
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">RFID Checkpoints</h1>
+        <h1 class="text-3xl font-bold text-gray-800">RFID Checkpoint Monitoring</h1>
         <div class="relative">
-            <input type="text" id="search-input" placeholder="Search checkpoints..."
+            <input type="text" id="search-input" placeholder="Search cards or checkpoints..."
                 class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -15,64 +15,62 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UID
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner
-                            Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Checkpoint</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last
-                            Tap In</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="checkpoint-table" class="bg-white divide-y divide-gray-200">
-                    @foreach ($checkpoints as $checkpoint)
-                    <tr id="row-{{ $checkpoint->id }}" data-uid="{{ $checkpoint->uid }}"
-                        class="hover:bg-gray-50 transition-colors duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $checkpoint->uid }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $checkpoint->owner_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $checkpoint->checkpoint }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s') : 'Never' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <button onclick="deleteCheckpoint({{ $checkpoint->id }})"
-                                class="text-red-600 hover:text-red-900 transition-colors duration-150"
-                                title="Delete checkpoint">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        @if($checkpoints->isEmpty())
-        <div class="text-center py-8">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No checkpoints</h3>
-            <p class="mt-1 text-sm text-gray-500">Start tapping RFID cards to see checkpoints appear here.</p>
-        </div>
-        @endif
+    @if($checkpoints->isEmpty())
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-gray-900">No checkpoint activity yet</h3>
+        <p class="mt-1 text-gray-500">RFID card taps will appear here automatically</p>
     </div>
+    @else
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($checkpoints->groupBy('checkpoint') as $location => $locationCheckpoints)
+
+        <div class="bg-white rounded-lg shadow overflow-hidden h-fit">
+            <div class="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
+                <h2 class="font-semibold text-lg text-gray-800">{{ $location }}</h2>
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {{ $locationCheckpoints->count() }} {{ Str::plural('tap', $locationCheckpoints->count()) }}
+                </span>
+            </div>
+
+            <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                @foreach($locationCheckpoints as $checkpoint)
+                <div class="px-6 py-4 hover:bg-gray-50 transition-colors duration-150 flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center">
+                            <div class="font-medium text-gray-900">{{ $checkpoint->uid }}</div>
+                            @if($checkpoint->owner_name)
+                            <span class="ml-2 text-sm text-gray-500">({{ $checkpoint->owner_name }})</span>
+                            @endif
+                        </div>
+                        <div class="mt-1 text-sm text-gray-500">
+                            <span
+                                title="{{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->format('Y-m-d H:i:s') : 'Never' }}">
+                                {{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->diffForHumans() : 'Never tapped' }}
+                            </span>
+                        </div>
+                    </div>
+                    <button onclick="deleteCheckpoint({{ $checkpoint->id }})"
+                        class="text-red-500 hover:text-red-700 transition-colors duration-150 p-1"
+                        title="Delete record">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
 
     <!-- Connection Status Indicator -->
-    <div class="mt-4 flex items-center">
+    <div class="mt-6 flex items-center">
         <span id="connection-status" class="flex items-center">
             <span class="h-3 w-3 rounded-full bg-gray-400 mr-2" id="connection-indicator"></span>
             <span class="text-sm text-gray-600">Connecting to WebSocket...</span>
@@ -81,19 +79,18 @@
 </div>
 
 <script>
+// WebSocket connection remains the same as original
 const socket = new WebSocket("ws://172.20.10.8:81");
 const connectionIndicator = document.getElementById('connection-indicator');
 const connectionStatus = document.getElementById('connection-status');
 
 socket.onopen = () => {
-    console.log("✅ WebSocket connected");
     connectionIndicator.classList.remove('bg-gray-400');
     connectionIndicator.classList.add('bg-green-500');
     connectionStatus.querySelector('span:last-child').textContent = 'Connected to RFID reader';
 };
 
 socket.onerror = (error) => {
-    console.error("❌ WebSocket error:", error);
     connectionIndicator.classList.remove('bg-gray-400', 'bg-green-500');
     connectionIndicator.classList.add('bg-red-500');
     connectionStatus.querySelector('span:last-child').textContent = 'Connection error - try refreshing the page';
@@ -105,14 +102,11 @@ socket.onclose = () => {
     connectionStatus.querySelector('span:last-child').textContent = 'Disconnected from RFID reader';
 };
 
-// Handle WebSocket message and add or update checkpoint rows
 socket.onmessage = async function(event) {
     try {
         const data = JSON.parse(event.data);
         const uid = data.uid;
         const checkpoint = data.checkpoint;
-
-        console.log("📡 Received:", data);
 
         // Show visual feedback for new tap
         showTapNotification(uid, checkpoint);
@@ -132,21 +126,43 @@ socket.onmessage = async function(event) {
 
         if (response.ok) {
             const result = await response.json();
-            const newTap = result.data;
-            console.log("✅ Checkpoint saved:", newTap);
-            addCheckpointRow(newTap);
+            console.log("✅ Checkpoint saved:", result.data);
+            window.location.reload();
         } else {
             const errorText = await response.text();
             console.error("❌ Failed to save checkpoint:", errorText);
             showErrorNotification("Error saving checkpoint: " + errorText);
         }
     } catch (e) {
-        console.error("❌ Error parsing WebSocket message or saving checkpoint:", e);
+        console.error("❌ Error processing RFID tap:", e);
         showErrorNotification("Error processing RFID tap");
     }
 };
 
-// Function to show visual feedback for new tap
+async function deleteCheckpoint(id) {
+    if (confirm('Are you sure you want to delete this checkpoint record?')) {
+        try {
+            const response = await fetch(`/checkpoints/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            if (response.ok) {
+                showSuccessNotification('Checkpoint record deleted successfully');
+                window.location.reload();
+            } else {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Failed to delete record');
+            }
+        } catch (error) {
+            console.error("❌ Failed to delete checkpoint:", error);
+            showErrorNotification('Failed to delete record: ' + error.message);
+        }
+    }
+}
+
 function showTapNotification(uid, checkpoint) {
     const notification = document.createElement('div');
     notification.className =
@@ -160,10 +176,7 @@ function showTapNotification(uid, checkpoint) {
             <p class="text-sm">UID: ${uid} at ${checkpoint}</p>
         </div>
     `;
-
     document.body.appendChild(notification);
-
-    // Remove notification after 3 seconds
     setTimeout(() => {
         notification.classList.add('animate-fade-out');
         setTimeout(() => notification.remove(), 300);
@@ -183,98 +196,11 @@ function showErrorNotification(message) {
             <p class="text-sm">${message}</p>
         </div>
     `;
-
     document.body.appendChild(notification);
-
-    // Remove notification after 5 seconds
     setTimeout(() => {
         notification.classList.add('animate-fade-out');
         setTimeout(() => notification.remove(), 300);
     }, 5000);
-}
-
-// Function to add or update a checkpoint row
-function addCheckpointRow(newTap) {
-    const table = document.getElementById("checkpoint-table");
-    const existingRow = document.getElementById(`row-${newTap.id}`);
-
-    // Format timestamp consistently with server
-    const formatTime = (timestamp) => {
-        if (!timestamp) return 'Never';
-        try {
-            const date = new Date(timestamp);
-            // Match server format (Y-m-d H:i:s)
-            const pad = num => num.toString().padStart(2, '0');
-            return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ` +
-                `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-        } catch (e) {
-            console.error("Error formatting date:", e);
-            return timestamp; // fallback to raw value
-        }
-    };
-
-    const newRowHTML = `
-        <tr id="row-${newTap.id}" data-uid="${newTap.uid}" class="hover:bg-gray-50 transition-colors duration-150 bg-green-50 animate-pulse">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${newTap.uid}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${newTap.owner_name || 'Unknown'}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${newTap.checkpoint}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                ${formatTime(newTap.last_tap_in)}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <button onclick="deleteCheckpoint(${newTap.id})"
-                    class="text-red-600 hover:text-red-900 transition-colors duration-150"
-                    title="Delete checkpoint">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
-            </td>
-        </tr>`;
-
-    if (existingRow) {
-        existingRow.outerHTML = newRowHTML;
-        const row = document.getElementById(`row-${newTap.id}`);
-        row.classList.add('bg-green-50', 'animate-pulse');
-        setTimeout(() => row.classList.remove('bg-green-50', 'animate-pulse'), 2000);
-    } else {
-        table.insertAdjacentHTML('afterbegin', newRowHTML);
-        const row = document.getElementById(`row-${newTap.id}`);
-        setTimeout(() => row.classList.remove('bg-green-50', 'animate-pulse'), 2000);
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
-}
-
-// Function to delete a checkpoint row
-async function deleteCheckpoint(id) {
-    if (confirm('Are you sure you want to delete this checkpoint?')) {
-        try {
-            const response = await fetch(`/checkpoints/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-
-            if (response.ok) {
-                const row = document.getElementById(`row-${id}`);
-                if (row) {
-                    row.classList.add('bg-red-50', 'animate-pulse');
-                    setTimeout(() => row.remove(), 300);
-                }
-                showSuccessNotification('Checkpoint deleted successfully');
-            } else {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Failed to delete checkpoint');
-            }
-        } catch (error) {
-            console.error("❌ Failed to delete checkpoint:", error);
-            showErrorNotification('Failed to delete checkpoint: ' + error.message);
-        }
-    }
 }
 
 function showSuccessNotification(message) {
@@ -290,27 +216,33 @@ function showSuccessNotification(message) {
             <p class="text-sm">${message}</p>
         </div>
     `;
-
     document.body.appendChild(notification);
-
     setTimeout(() => {
         notification.classList.add('animate-fade-out');
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Search functionality
+// Search functionality for side-by-side view
 document.getElementById('search-input').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#checkpoint-table tr');
+    const cards = document.querySelectorAll('.divide-y > div'); // Target individual tap records
 
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
         if (text.includes(searchTerm)) {
-            row.style.display = '';
+            card.style.display = '';
+            // Make sure parent sections are visible
+            card.closest('.bg-white').style.display = '';
         } else {
-            row.style.display = 'none';
+            card.style.display = 'none';
         }
+
+        // Hide entire location sections if they have no visible cards
+        document.querySelectorAll('.bg-white').forEach(section => {
+            const hasVisibleCards = section.querySelector('.divide-y > div[style=""]') !== null;
+            section.style.display = hasVisibleCards ? '' : 'none';
+        });
     });
 });
 </script>
@@ -346,20 +278,23 @@ document.getElementById('search-input').addEventListener('input', function(e) {
     animation: fadeOut 0.3s ease-out forwards;
 }
 
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
+/* Custom scrollbar for checkpoint lists */
+.max-h-96::-webkit-scrollbar {
+    width: 6px;
 }
 
-@keyframes pulse {
+.max-h-96::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
 
-    0%,
-    100% {
-        background-color: inherit;
-    }
+.max-h-96::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
 
-    50% {
-        background-color: #f0fdf4;
-    }
+.max-h-96::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
 }
 </style>
 @endsection
