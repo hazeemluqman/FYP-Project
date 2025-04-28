@@ -30,13 +30,13 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-500">Active Workers</p>
-                    <h3 class="text-2xl font-bold mt-1">142</h3>
+                    <h3 class="text-2xl font-bold mt-1">{{ $activeWorkers }}</h3>
                 </div>
                 <div class="bg-green-100 p-3 rounded-lg">
                     <i class="fas fa-users text-green-600"></i>
                 </div>
             </div>
-            <p class="text-xs text-green-600 mt-2"><i class="fas fa-arrow-up mr-1"></i> 12% from yesterday</p>
+            <p class="text-xs text-green-600 mt-2"><i class="fas fa-arrow-up mr-1"></i> Updated dynamically</p>
         </div>
 
         <div
@@ -44,7 +44,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm text-gray-500">Checkpoints</p>
-                    <h3 class="text-2xl font-bold mt-1">15</h3>
+                    <h3 class="text-2xl font-bold mt-1">{{ $totalCheckpoints }}</h3>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-lg">
                     <i class="fas fa-map-marker-alt text-yellow-600"></i>
@@ -63,10 +63,31 @@
             </h2>
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <input type="text" id="search-input" placeholder="Search cards or checkpoints..."
+                    <input type="text" id="search-input" placeholder="Search by UID or Name..."
                         class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
+                <script>
+                document.getElementById('search-input').addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const cards = document.querySelectorAll('.divide-y > div');
+
+                    cards.forEach(card => {
+                        const uid = card.querySelector('.font-medium')?.textContent.toLowerCase() || '';
+                        const name = card.querySelector('.text-sm.text-gray-500')?.textContent
+                            .toLowerCase() || '';
+                        const text = uid + ' ' + name;
+                        card.style.display = text.includes(searchTerm) ? '' : 'none';
+
+                        // Show/hide entire location sections
+                        const section = card.closest('.bg-gray-50');
+                        const hasVisibleCards = section.querySelector('.divide-y > div[style=""]') !==
+                            null;
+                        section.style.display = hasVisibleCards ? '' : 'none';
+                    });
+                });
+                </script>
+                </script>
                 <button class="text-sm text-green-600 hover:text-green-800 flex items-center smooth-transition">
                     View All <i class="fas fa-chevron-right ml-1 text-xs"></i>
                 </button>
@@ -119,16 +140,25 @@
                                         <i class="far fa-clock mr-1.5 text-gray-400"></i>
                                         <span
                                             title="{{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->format('Y-m-d H:i:s') : 'Never' }}">
-                                            {{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->diffForHumans() : 'Never tapped' }}
+                                            {{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->format('M j, Y g:i A') : 'Never tapped' }}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="deleteCheckpoint({{ $checkpoint->id }})"
-                                class="text-gray-400 hover:text-red-500 transition-colors duration-150 p-1 opacity-0 group-hover:opacity-100"
-                                title="Delete record">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <div class="flex space-x-2">
+                                <!-- Edit Button -->
+                                <a href="{{ route('checkpoints.edit', $checkpoint->id) }}"
+                                    class="text-gray-400 hover:text-blue-500 transition-colors duration-150 p-1"
+                                    title="Edit record">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- Delete Button -->
+                                <button onclick="deleteCheckpoint({{ $checkpoint->id }})"
+                                    class="text-gray-400 hover:text-red-500 transition-colors duration-150 p-1 opacity-0 group-hover:opacity-100"
+                                    title="Delete record">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </div>
                         @endforeach
                     </div>

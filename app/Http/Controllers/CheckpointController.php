@@ -10,16 +10,20 @@ use Illuminate\Http\JsonResponse;
 class CheckpointController extends Controller
 {
     public function index()
-    {
-        $uid = request('uid'); // maybe passed from query or session
+{
+    $uid = request('uid'); // maybe passed from query or session
 
     $checkpoints = Checkpoint::when($uid, function($query, $uid) {
         return $query->where('uid', $uid);
     })->latest()->get();
-        
-        // Return the checkpoints index view
-        return view('checkpoints.index', compact('checkpoints'));
-    }
+
+    // Calculate stats
+    $activeWorkers = Checkpoint::distinct('uid')->count('uid'); // Count unique UIDs
+    $totalCheckpoints = Checkpoint::distinct('checkpoint')->count('checkpoint'); // Count unique checkpoints
+
+    // Return the checkpoints index view with stats
+    return view('checkpoints.index', compact('checkpoints', 'activeWorkers', 'totalCheckpoints'));
+}
 
     public function store(Request $request): JsonResponse
     {

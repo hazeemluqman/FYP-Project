@@ -115,8 +115,6 @@
                         <a href="{{ url('/checkpoints') }}" class="flex items-center p-3 space-x-3">
                             <i class="fas fa-tachometer-alt w-5 text-green-200"></i>
                             <span class="flex-1">Dashboard</span>
-                            <span
-                                class="notification-badge bg-white bg-opacity-20 text-white px-1.5 py-0.5 rounded-full flex items-center justify-center">3</span>
                         </a>
                     </li>
                     <li class="sidebar-item {{ Request::is('activities*') ? 'active' : '' }}">
@@ -129,8 +127,6 @@
                         <a href="{{ url('/rfids') }}" class="flex items-center p-3 space-x-3">
                             <i class="fas fa-users w-5 text-green-200"></i>
                             <span class="flex-1">List Workers</span>
-                            <span
-                                class="notification-badge bg-white bg-opacity-20 text-white px-1.5 py-0.5 rounded-full flex items-center justify-center">12</span>
                         </a>
                     </li>
                     <li class="sidebar-item {{ Request::is('reports*') ? 'active' : '' }}">
