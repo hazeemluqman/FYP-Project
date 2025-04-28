@@ -2,192 +2,218 @@
 
 @section('content')
 <!-- Header -->
-<div class="flex justify-between items-center mb-8">
+<div class="flex justify-between items-center mb-6">
     <div>
         <h1 class="text-2xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-leaf text-green-600 mr-2"></i>
-            SMART-WET Dashboard
+            <i class="fas fa-route text-green-600 mr-2"></i>
+            Worker Checkpoint Progress
         </h1>
-        <p class="text-gray-600">Welcome back, Admin! <span class="text-green-600">Today is
-                {{ date('l, F j, Y') }}</span></p>
+        <p class="text-gray-600">Live tracking • {{ date('l, F j, Y') }}</p>
     </div>
-    <div class="flex items-center space-x-4">
-        <div class="relative">
-            <i class="fas fa-bell text-gray-500 text-xl cursor-pointer hover:text-green-600 smooth-transition"></i>
-            <span
-                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-        </div>
-        <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center cursor-pointer">
-            <i class="fas fa-user text-green-600"></i>
+    <div class="flex items-center space-x-3">
+        <div class="relative" x-data="{ open: false }" @click.away="open = false">
+            <button @click="open = !open" class="relative p-1 text-gray-500 hover:text-green-600">
+                <i class="fas fa-bell text-xl"></i>
+                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+            </button>
         </div>
     </div>
 </div>
-<div class="container mx-auto px-4 py-6">
+
+<div class="container mx-auto px-4">
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div
-            class="card bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+            <div class="flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-500">Active Workers</p>
-                    <h3 class="text-2xl font-bold mt-1">{{ $activeWorkers }}</h3>
+                    <h3 class="text-xl font-bold">{{ $activeWorkers }}</h3>
                 </div>
-                <div class="bg-green-100 p-3 rounded-lg">
-                    <i class="fas fa-users text-green-600"></i>
-                </div>
+                <i class="fas fa-users text-green-500 text-xl"></i>
             </div>
-            <p class="text-xs text-green-600 mt-2"><i class="fas fa-arrow-up mr-1"></i> Updated dynamically</p>
         </div>
-
-        <div
-            class="card bg-white rounded-xl shadow-sm p-6 border-l-4 border-yellow-500 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+            <div class="flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-500">Checkpoints</p>
-                    <h3 class="text-2xl font-bold mt-1">{{ $totalCheckpoints }}</h3>
+                    <h3 class="text-xl font-bold">{{ $totalCheckpoints }}</h3>
                 </div>
-                <div class="bg-yellow-100 p-3 rounded-lg">
-                    <i class="fas fa-map-marker-alt text-yellow-600"></i>
-                </div>
+                <i class="fas fa-map-marker-alt text-blue-500 text-xl"></i>
             </div>
-            <p class="text-xs text-gray-500 mt-2">All checkpoints operational</p>
         </div>
     </div>
 
-    <!-- Checkpoint Monitoring Section -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8 border border-gray-100">
-        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
-                <i class="fas fa-map-marker-alt text-green-600 mr-2"></i>
-                RFID Checkpoint Monitoring
+    <!-- Checkpoint Progress Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+        <div
+            class="px-4 py-3 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50">
+            <h2 class="font-medium flex items-center">
+                <i class="fas fa-user-check text-green-600 mr-2"></i>
+                Current Worker Status
             </h2>
-            <div class="flex items-center space-x-4">
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="Search by UID or Name..."
-                        class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </div>
-                <script>
-                document.getElementById('search-input').addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const cards = document.querySelectorAll('.divide-y > div');
-
-                    cards.forEach(card => {
-                        const uid = card.querySelector('.font-medium')?.textContent.toLowerCase() || '';
-                        const name = card.querySelector('.text-sm.text-gray-500')?.textContent
-                            .toLowerCase() || '';
-                        const text = uid + ' ' + name;
-                        card.style.display = text.includes(searchTerm) ? '' : 'none';
-
-                        // Show/hide entire location sections
-                        const section = card.closest('.bg-gray-50');
-                        const hasVisibleCards = section.querySelector('.divide-y > div[style=""]') !==
-                            null;
-                        section.style.display = hasVisibleCards ? '' : 'none';
-                    });
-                });
-                </script>
-                </script>
-                <button class="text-sm text-green-600 hover:text-green-800 flex items-center smooth-transition">
-                    View All <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                </button>
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="search-input" placeholder="Search workers..."
+                    class="w-full pl-8 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <i class="fas fa-search absolute left-2.5 top-3 text-gray-400"></i>
             </div>
         </div>
 
-        <div class="p-6">
-            @if($checkpoints->isEmpty())
-            <div class="bg-gray-50 rounded-lg p-8 text-center">
-                <div class="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-map-marked-alt text-green-600 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">No checkpoint activity yet</h3>
-                <p class="mt-1 text-gray-500">RFID card taps will appear here automatically</p>
-            </div>
-            @else
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                @foreach($checkpoints->groupBy('checkpoint') as $location => $locationCheckpoints)
-                <div
-                    class="bg-gray-50 rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                    <div class="px-6 py-4 bg-white border-b flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-map-pin text-green-600"></i>
-                            </div>
-                            <h3 class="font-semibold text-gray-800">{{ $location }}</h3>
-                        </div>
-                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            {{ $locationCheckpoints->count() }} {{ Str::plural('tap', $locationCheckpoints->count()) }}
-                        </span>
-                    </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Worker
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            UID
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Checkpoint 1
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Checkpoint 2
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Checkpoint 3
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Progress
+                        </th>
+                        <th scope="col"
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @if($checkpoints->isEmpty())
+                    <tr>
+                        <td colspan="7" class="px-4 py-3 text-center text-gray-500">
+                            No checkpoint data available
+                        </td>
+                    </tr>
+                    @else
+                    @foreach($checkpoints->groupBy('uid') as $uid => $workerCheckpoints)
+                    @php
+                    $worker = $workerCheckpoints->first();
 
-                    <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                        @foreach($locationCheckpoints as $checkpoint)
-                        <div
-                            class="px-6 py-4 hover:bg-white transition-colors duration-150 flex justify-between items-start group">
-                            <div class="flex items-start">
+                    // Initialize checkpoint times
+                    $checkpoint1 = $workerCheckpoints->where('checkpoint', 'Checkpoint 1')->first();
+                    $checkpoint2 = $workerCheckpoints->where('checkpoint', 'Checkpoint 2')->first();
+                    $checkpoint3 = $workerCheckpoints->where('checkpoint', 'Checkpoint 3')->first();
+
+                    // Calculate progress
+                    $completed = 0;
+                    if ($checkpoint1) $completed++;
+                    if ($checkpoint2) $completed++;
+                    if ($checkpoint3) $completed++;
+                    $progress = round(($completed / 3) * 100);
+                    @endphp
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center">
                                 <div
-                                    class="h-8 w-8 bg-blue-50 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                                    <i class="fas fa-id-card text-blue-500 text-sm"></i>
+                                    class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                    <i class="fas fa-user text-blue-500 text-sm"></i>
                                 </div>
                                 <div>
-                                    <div class="flex items-center">
-                                        <div class="font-medium text-gray-900">{{ $checkpoint->uid }}</div>
-                                        @if($checkpoint->owner_name)
-                                        <span class="ml-2 text-sm text-gray-500">({{ $checkpoint->owner_name }})</span>
-                                        @endif
-                                    </div>
-                                    <div class="mt-1 text-sm text-gray-500 flex items-center">
-                                        <i class="far fa-clock mr-1.5 text-gray-400"></i>
-                                        <span
-                                            title="{{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->format('Y-m-d H:i:s') : 'Never' }}">
-                                            {{ $checkpoint->last_tap_in ? \Carbon\Carbon::parse($checkpoint->last_tap_in)->format('M j, Y g:i A') : 'Never tapped' }}
-                                        </span>
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $worker->owner_name ?? 'Unknown' }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <!-- Edit Button -->
-                                <a href="{{ route('checkpoints.edit', $checkpoint->id) }}"
-                                    class="text-gray-400 hover:text-blue-500 transition-colors duration-150 p-1"
-                                    title="Edit record">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <!-- Delete Button -->
-                                <button onclick="deleteCheckpoint({{ $checkpoint->id }})"
-                                    class="text-gray-400 hover:text-red-500 transition-colors duration-150 p-1 opacity-0 group-hover:opacity-100"
-                                    title="Delete record">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
+                            {{ $uid }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            @if($checkpoint1)
+                            <div>
+                                <div>{{ \Carbon\Carbon::parse($checkpoint1->last_tap_in)->format('M j, Y g:i A') }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ \Carbon\Carbon::parse($checkpoint1->last_tap_in)->diffForHumans() }}</div>
                             </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            @endif
+                            @else
+                            <span class="text-gray-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            @if($checkpoint2)
+                            <div>
+                                <div>{{ \Carbon\Carbon::parse($checkpoint2->last_tap_in)->format('M j, Y g:i A') }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ \Carbon\Carbon::parse($checkpoint2->last_tap_in)->diffForHumans() }}</div>
+                            </div>
+                            @else
+                            <span class="text-gray-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            @if($checkpoint3)
+                            <div>
+                                <div>{{ \Carbon\Carbon::parse($checkpoint3->last_tap_in)->format('M j, Y g:i A') }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ \Carbon\Carbon::parse($checkpoint3->last_tap_in)->diffForHumans() }}</div>
+                            </div>
+                            @else
+                            <span class="text-gray-400">—</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-1.5 mr-2">
+                                    <div class="bg-green-500 h-1.5 rounded-full" style="width: {{ $progress }}%"></div>
+                                </div>
+                                <span class="text-xs font-medium">{{ $progress }}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ route('checkpoints.edit', $worker->id) }}"
+                                class="text-blue-600 hover:text-blue-900 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="deleteCheckpoint({{ $worker->id }})"
+                                class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                    @endif
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Connection Status -->
-    <div class="mt-6 flex items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+    <!-- System Status -->
+    <div class="bg-white rounded-lg shadow p-3 flex items-center justify-between">
         <div class="flex items-center">
             <span id="connection-indicator" class="h-3 w-3 rounded-full bg-gray-400 mr-3 animate-pulse"></span>
             <span id="connection-status" class="text-sm text-gray-600">Connecting to WebSocket...</span>
         </div>
         <button onclick="window.location.reload()"
-            class="ml-auto text-sm text-green-600 hover:text-green-800 flex items-center">
-            <i class="fas fa-sync-alt mr-1"></i> Reconnect
+            class="text-sm text-green-600 hover:text-green-800 flex items-center">
+            <i class="fas fa-sync-alt mr-1"></i> Refresh
         </button>
     </div>
 </div>
 
 <script>
-// Enhanced WebSocket connection with retry logic
+// WebSocket connection code remains the same as previous version
 let socket;
 let retryCount = 0;
 const maxRetries = 5;
-const retryDelay = 3000; // 3 seconds
+const retryDelay = 3000;
 
 function connectWebSocket() {
     socket = new WebSocket("ws://172.20.10.8:81");
@@ -258,7 +284,6 @@ function connectWebSocket() {
     };
 }
 
-// Initialize WebSocket connection
 connectWebSocket();
 
 async function deleteCheckpoint(id) {
@@ -283,7 +308,7 @@ async function deleteCheckpoint(id) {
     }
 }
 
-// Notification functions with improved styling
+// Notification functions
 function showTapNotification(uid, checkpoint) {
     showNotification({
         title: 'New RFID Tap Detected',
@@ -339,19 +364,16 @@ function showNotification({
     }, 5000);
 }
 
-// Enhanced search functionality
+// Search functionality
 document.getElementById('search-input').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
-    const cards = document.querySelectorAll('.divide-y > div');
+    const rows = document.querySelectorAll('tbody tr');
 
-    cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(searchTerm) ? '' : 'none';
-
-        // Show/hide entire location sections
-        const section = card.closest('.bg-gray-50');
-        const hasVisibleCards = section.querySelector('.divide-y > div[style=""]') !== null;
-        section.style.display = hasVisibleCards ? '' : 'none';
+    rows.forEach(row => {
+        const uid = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const name = row.querySelector('td:first-child .text-sm').textContent.toLowerCase();
+        const text = uid + ' ' + name;
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
     });
 });
 </script>
@@ -387,26 +409,53 @@ document.getElementById('search-input').addEventListener('input', function(e) {
     animation: fadeOut 0.3s ease-out forwards;
 }
 
-/* Custom scrollbar */
-.max-h-96::-webkit-scrollbar {
-    width: 6px;
+/* Table styling */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+th:first-child {
+    border-left: 1px solid #e5e7eb;
+}
+
+th:last-child {
+    border-right: 1px solid #e5e7eb;
+}
+
+tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Progress bar styling */
+.progress-container {
+    display: flex;
+    align-items: center;
+}
+
+.progress-bar {
+    width: 60px;
     height: 6px;
-}
-
-.max-h-96::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background-color: #e5e7eb;
     border-radius: 3px;
+    overflow: hidden;
+    margin-right: 8px;
 }
 
-.max-h-96::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 3px;
+.progress-fill {
+    height: 100%;
+    background-color: #10b981;
+    transition: width 0.3s ease;
 }
 
-.max-h-96::-webkit-scrollbar-thumb:hover {
-    background: #a0aec0;
-}
-
+/* Smooth transitions */
 .smooth-transition {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
