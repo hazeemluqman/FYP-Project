@@ -182,10 +182,36 @@
                                 class="text-blue-600 hover:text-blue-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button onclick="deleteCheckpoint({{ $worker->id }})"
-                                class="text-red-600 hover:text-red-900">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <!-- Dropdown for Delete -->
+                            <div class="relative inline-block text-left">
+                                <button onclick="toggleDropdown({{ $worker->id }})"
+                                    class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                <div id="dropdown-{{ $worker->id }}"
+                                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                                    <div class="py-1">
+                                        @if($checkpoint1)
+                                        <button onclick="deleteCheckpoint({{ $checkpoint1->id }})"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            Delete Checkpoint 1
+                                        </button>
+                                        @endif
+                                        @if($checkpoint2)
+                                        <button onclick="deleteCheckpoint({{ $checkpoint2->id }})"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            Delete Checkpoint 2
+                                        </button>
+                                        @endif
+                                        @if($checkpoint3)
+                                        <button onclick="deleteCheckpoint({{ $checkpoint3->id }})"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            Delete Checkpoint 3
+                                        </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -286,8 +312,13 @@ function connectWebSocket() {
 
 connectWebSocket();
 
+function toggleDropdown(workerId) {
+    const dropdown = document.getElementById(`dropdown-${workerId}`);
+    dropdown.classList.toggle('hidden');
+}
+
 async function deleteCheckpoint(id) {
-    if (confirm('Are you sure you want to delete this checkpoint record?')) {
+    if (confirm('Are you sure you want to delete this checkpoint?')) {
         try {
             const response = await fetch(`/checkpoints/${id}`, {
                 method: 'DELETE',
@@ -297,13 +328,14 @@ async function deleteCheckpoint(id) {
             });
 
             if (response.ok) {
-                showSuccessNotification('Checkpoint record deleted successfully');
+                alert('Checkpoint deleted successfully');
                 window.location.reload();
             } else {
-                throw new Error(await response.text());
+                const errorText = await response.text();
+                alert('Failed to delete checkpoint: ' + errorText);
             }
         } catch (error) {
-            showErrorNotification('Failed to delete record: ' + error.message);
+            alert('An error occurred: ' + error.message);
         }
     }
 }

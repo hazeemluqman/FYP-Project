@@ -97,4 +97,40 @@ class CheckpointController extends Controller
             ], 500);  // Return a 500 internal server error
         }
     }
+
+public function edit($id)
+{
+    $checkpoint = Checkpoint::findOrFail($id);
+    $availableCheckpoints = ['Checkpoint 1', 'Checkpoint 2', 'Checkpoint 3']; // Example enum values
+
+    return view('checkpoints.edit', compact('checkpoint', 'availableCheckpoints'));
+}
+
+public function update(Request $request, $id)
+{
+    // Validate the incoming data
+    $request->validate([
+        'owner_name' => 'required|string|max:255',
+        'checkpoint' => 'required|string|in:Checkpoint 1,Checkpoint 2,Checkpoint 3',
+        'last_tap_in' => 'required|date',
+    ]);
+
+    try {
+        // Find the checkpoint by its ID
+        $checkpoint = Checkpoint::findOrFail($id);
+
+        // Update the checkpoint data
+        $checkpoint->update([
+            'owner_name' => $request->owner_name,
+            'checkpoint' => $request->checkpoint,
+            'last_tap_in' => $request->last_tap_in,
+        ]);
+
+        // Redirect back to the index page with a success message
+        return redirect()->route('checkpoints.index')->with('success', 'Checkpoint updated successfully.');
+    } catch (\Exception $e) {
+        // Handle any potential errors
+        return redirect()->back()->with('error', 'An error occurred while updating the checkpoint.');
+    }
+}
 }
