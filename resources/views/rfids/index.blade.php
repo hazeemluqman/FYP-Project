@@ -58,20 +58,23 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex justify-end space-x-2">
+                                <!-- View Details -->
                                 <a href="{{ route('rfids.show', $rfid->id) }}"
                                     class="text-green-600 hover:text-green-900 mr-3" title="View Details">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye"></i> Details
                                 </a>
+                                <!-- Edit -->
                                 <a href="{{ route('rfids.edit', $rfid->id) }}"
                                     class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-edit"></i> Edit
                                 </a>
+                                <!-- Delete -->
                                 <form action="{{ route('rfids.destroy', $rfid->id) }}" method="POST"
                                     onsubmit="return confirm('Are you sure you want to delete this RFID card?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
+                                        <i class="fas fa-trash-alt"></i> Delete
                                     </button>
                                 </form>
                             </div>

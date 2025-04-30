@@ -1,56 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assign RFID Card</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-    .card {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
-    }
-
-    .card:hover {
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .input-focus:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-    .btn-primary {
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-1px);
-    }
-
-    .rfid-animation {
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0% {
-            opacity: 0.7;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.7;
-        }
-    }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+@section('content')
+<div class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
     <div class="card bg-white p-8 rounded-xl w-full max-w-md">
         <div class="text-center mb-6">
             <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
@@ -85,7 +36,7 @@
         <form action="{{ route('rfids.store') }}" method="POST" class="space-y-5">
             @csrf
 
-            <!-- Owner Name -->
+            <!-- Worker Name -->
             <div>
                 <label for="owner_name" class="block text-sm font-medium text-gray-700 mb-1">Worker Name</label>
                 <div class="relative rounded-md shadow-sm">
@@ -98,7 +49,7 @@
                 </div>
             </div>
 
-            <!-- RFID UID (Auto-filled) -->
+            <!-- RFID UID -->
             <div>
                 <label for="uid" class="block text-sm font-medium text-gray-700 mb-1">RFID Card UID</label>
                 <div class="relative rounded-md shadow-sm">
@@ -136,43 +87,89 @@
             </div>
         </form>
     </div>
+</div>
 
-    <script>
-    // WebSocket to listen for UID from the ESP32
-    const socket = new WebSocket("ws://172.20.10.8:81"); // Adjust IP to your ESP32 WebSocket server
+<!-- Tailwind CSS & Font Awesome -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-    socket.onopen = () => {
-        console.log("WebSocket Connected");
-        document.getElementById('uid-placeholder').innerHTML =
-            '<i class="fas fa-circle-notch fa-spin mr-2"></i><span>Connected - Waiting for RFID card scan...</span>';
-    };
+<!-- Extra Styles -->
+<style>
+.card {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
 
-    socket.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            const uidInput = document.getElementById('uid');
-            const placeholder = document.getElementById('uid-placeholder');
+.card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
 
-            if (data.uid) {
-                uidInput.value = data.uid;
-                placeholder.innerHTML =
-                    '<i class="fas fa-check-circle text-green-500 mr-2"></i><span>RFID card detected!</span>';
-                placeholder.classList.remove('text-blue-600', 'rfid-animation');
-                placeholder.classList.add('text-green-600');
-            }
-        } catch (e) {
-            console.error("Error parsing WebSocket message:", e);
-        }
-    };
+.input-focus:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
 
-    socket.onerror = () => {
+.btn-primary {
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.rfid-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
+}
+</style>
+
+<!-- WebSocket Script -->
+<script>
+const socket = new WebSocket("ws://172.20.10.8:81"); // Adjust IP to your ESP32 WebSocket server
+
+socket.onopen = () => {
+    console.log("WebSocket Connected");
+    document.getElementById('uid-placeholder').innerHTML =
+        '<i class="fas fa-circle-notch fa-spin mr-2"></i><span>Connected - Waiting for RFID card scan...</span>';
+};
+
+socket.onmessage = (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        const uidInput = document.getElementById('uid');
         const placeholder = document.getElementById('uid-placeholder');
-        placeholder.innerHTML =
-            '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i><span>Connection error - Please check ESP32 connection</span>';
-        placeholder.classList.remove('text-blue-600', 'rfid-animation');
-        placeholder.classList.add('text-red-600');
-    };
-    </script>
-</body>
 
-</html>
+        if (data.uid) {
+            uidInput.value = data.uid;
+            placeholder.innerHTML =
+                '<i class="fas fa-check-circle text-green-500 mr-2"></i><span>RFID card detected!</span>';
+            placeholder.classList.remove('text-blue-600', 'rfid-animation');
+            placeholder.classList.add('text-green-600');
+        }
+    } catch (e) {
+        console.error("Error parsing WebSocket message:", e);
+    }
+};
+
+socket.onerror = () => {
+    const placeholder = document.getElementById('uid-placeholder');
+    placeholder.innerHTML =
+        '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i><span>Connection error - Please check ESP32 connection</span>';
+    placeholder.classList.remove('text-blue-600', 'rfid-animation');
+    placeholder.classList.add('text-red-600');
+};
+</script>
+@endsection
