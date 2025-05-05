@@ -181,34 +181,62 @@
                                 <span class="text-xs font-medium">{{ $progress }}%</span>
                             </div>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                            <a href="{{ route('checkpoints.edit', $worker->id) }}"
-                                class="text-blue-600 hover:text-blue-900 mr-3">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm  flex items-center space-x-2">
+                            <!-- Edit Dropdown -->
                             <div class="relative inline-block text-left">
-                                <button onclick="toggleDropdown({{ $worker->id }})"
+                                <button onclick="toggleEditDropdown({{ $worker->id }})"
+                                    class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <div id="edit-dropdown-{{ $worker->id }}"
+                                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                                    <div class="py-1">
+                                        @if($checkpoint1)
+                                        <a href="{{ route('checkpoints.edit', $checkpoint1->id) }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            Edit Checkpoint 1
+                                        </a>
+                                        @endif
+                                        @if($checkpoint2)
+                                        <a href="{{ route('checkpoints.edit', $checkpoint2->id) }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            Edit Checkpoint 2
+                                        </a>
+                                        @endif
+                                        @if($checkpoint3)
+                                        <a href="{{ route('checkpoints.edit', $checkpoint3->id) }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                            Edit Checkpoint 3
+                                        </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Dropdown -->
+                            <div class="relative inline-block text-left">
+                                <button onclick="toggleDeleteDropdown({{ $worker->id }})"
                                     class="text-red-600 hover:text-red-900">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
-                                <div id="dropdown-{{ $worker->id }}"
+                                <div id="delete-dropdown-{{ $worker->id }}"
                                     class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
                                     <div class="py-1">
                                         @if($checkpoint1)
                                         <button onclick="deleteCheckpoint({{ $checkpoint1->id }})"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
                                             Delete Checkpoint 1
                                         </button>
                                         @endif
                                         @if($checkpoint2)
                                         <button onclick="deleteCheckpoint({{ $checkpoint2->id }})"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
                                             Delete Checkpoint 2
                                         </button>
                                         @endif
                                         @if($checkpoint3)
                                         <button onclick="deleteCheckpoint({{ $checkpoint3->id }})"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100">
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
                                             Delete Checkpoint 3
                                         </button>
                                         @endif
@@ -315,10 +343,40 @@ function connectWebSocket() {
 
 connectWebSocket();
 
-function toggleDropdown(workerId) {
-    const dropdown = document.getElementById(`dropdown-${workerId}`);
+function toggleEditDropdown(workerId) {
+    const dropdown = document.getElementById(`edit-dropdown-${workerId}`);
+    // Close any other open edit dropdowns
+    document.querySelectorAll('.edit-dropdown').forEach(d => {
+        if (d.id !== `edit-dropdown-${workerId}`) d.classList.add('hidden');
+    });
     dropdown.classList.toggle('hidden');
+
+    // Close delete dropdown if open
+    const deleteDropdown = document.getElementById(`delete-dropdown-${workerId}`);
+    if (deleteDropdown) deleteDropdown.classList.add('hidden');
 }
+
+function toggleDeleteDropdown(workerId) {
+    const dropdown = document.getElementById(`delete-dropdown-${workerId}`);
+    // Close any other open delete dropdowns
+    document.querySelectorAll('.delete-dropdown').forEach(d => {
+        if (d.id !== `delete-dropdown-${workerId}`) d.classList.add('hidden');
+    });
+    dropdown.classList.toggle('hidden');
+
+    // Close edit dropdown if open
+    const editDropdown = document.getElementById(`edit-dropdown-${workerId}`);
+    if (editDropdown) editDropdown.classList.add('hidden');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.relative.inline-block.text-left')) {
+        document.querySelectorAll('.edit-dropdown, .delete-dropdown').forEach(dropdown => {
+            dropdown.classList.add('hidden');
+        });
+    }
+});
 
 async function deleteCheckpoint(id) {
     if (confirm('Are you sure you want to delete this checkpoint?')) {
@@ -331,14 +389,14 @@ async function deleteCheckpoint(id) {
             });
 
             if (response.ok) {
-                alert('Checkpoint deleted successfully');
-                window.location.reload();
+                showSuccessNotification('Checkpoint deleted successfully');
+                setTimeout(() => window.location.reload(), 1000);
             } else {
                 const errorText = await response.text();
-                alert('Failed to delete checkpoint: ' + errorText);
+                showErrorNotification('Failed to delete checkpoint: ' + errorText);
             }
         } catch (error) {
-            alert('An error occurred: ' + error.message);
+            showErrorNotification('An error occurred: ' + error.message);
         }
     }
 }
@@ -399,7 +457,7 @@ function showNotification({
     }, 5000);
 }
 
-// Search functionality - Corrected version
+// Search functionality
 document.getElementById('search-input').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase().trim();
     const rows = document.querySelectorAll('.worker-row');
@@ -536,6 +594,29 @@ tr:hover {
 /* Smooth transitions */
 .smooth-transition {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Action buttons styling */
+.fa-edit,
+.fa-trash-alt {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.fa-edit:hover {
+    color: #2563eb;
+    transform: scale(1.1);
+}
+
+.fa-trash-alt:hover {
+    color: #dc2626;
+    transform: scale(1.1);
+}
+
+/* Dropdown styling */
+.edit-dropdown a:hover,
+.delete-dropdown button:hover {
+    background-color: #f8fafc;
 }
 </style>
 @endsection
