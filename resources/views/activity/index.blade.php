@@ -10,15 +10,18 @@
         </div>
 
         <div class="w-full md:w-auto">
-            <div class="relative">
-                <input type="text" placeholder="Search cards..."
-                    class="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full">
-                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
+            <form id="search-form">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Search workers..."
+                        class="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+                        value="{{ request('search') }}">
+                    <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -36,6 +39,12 @@
     @else
     <!-- Cards Table -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        @if(request('search'))
+        <div class="px-6 py-3 bg-blue-50 text-sm text-blue-800 flex justify-between items-center">
+            <span>Showing results for: "{{ request('search') }}"</span>
+            <a href="{{ route('rfids.index') }}" class="text-blue-600 hover:text-blue-800">Clear search</a>
+        </div>
+        @endif
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -54,9 +63,10 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white divide-y divide-gray-200" id="cards-table-body">
                     @foreach ($rfids as $rfid)
-                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                    <tr class="hover:bg-gray-50 transition-colors duration-150" data-uid="{{ $rfid->uid }}"
+                        data-name="{{ $rfid->owner_name }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div
@@ -69,8 +79,9 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="font-mono text-sm font-medium text-gray-900">{{ $rfid->uid }}</div>
-                                    <div class="text-sm text-gray-500">{{ $rfid->owner_name }}</div>
+                                    <div class="font-mono text-sm font-medium text-gray-900 card-uid">{{ $rfid->uid }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 card-name">{{ $rfid->owner_name }}</div>
                                 </div>
                             </div>
                         </td>
@@ -114,4 +125,76 @@
     </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const cardsTableBody = document.getElementById('cards-table-body');
+
+    // Client-side search functionality
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const rows = cardsTableBody.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const uid = row.getAttribute('data-uid').toLowerCase();
+            const name = row.getAttribute('data-name').toLowerCase();
+
+            // Clear previous highlights
+            const uidCell = row.querySelector('.card-uid');
+            const nameCell = row.querySelector('.card-name');
+            if (uidCell) uidCell.innerHTML = uidCell.textContent;
+            if (nameCell) nameCell.innerHTML = nameCell.textContent;
+
+            if (searchTerm === '' || uid.includes(searchTerm) || name.includes(searchTerm)) {
+                row.style.display = '';
+
+                // Highlight matches
+                if (searchTerm !== '') {
+                    if (uid.includes(searchTerm) && uidCell) {
+                        highlightText(uidCell, searchTerm);
+                    }
+                    if (name.includes(searchTerm) && nameCell) {
+                        highlightText(nameCell, searchTerm);
+                    }
+                }
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Form submission handler for server-side search fallback
+    const searchForm = document.getElementById('search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                window.location.href = "{{ route('rfids.index') }}?search=" + encodeURIComponent(
+                    searchTerm);
+            } else {
+                window.location.href = "{{ route('rfids.index') }}";
+            }
+        });
+    }
+});
+
+function highlightText(element, searchText) {
+    const text = element.textContent;
+    const regex = new RegExp(searchText, 'gi');
+    element.innerHTML = text.replace(regex, match =>
+        `<span class="highlight bg-yellow-200">${match}</span>`
+    );
+}
+</script>
+
+<style>
+.highlight {
+    background-color: #fef08a;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+}
+</style>
 @endsection

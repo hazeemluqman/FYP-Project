@@ -92,7 +92,7 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white divide-y divide-gray-200" id="workers-table-body">
                     @if($checkpoints->isEmpty())
                     <tr>
                         <td colspan="7" class="px-4 py-3 text-center text-gray-500">
@@ -116,7 +116,8 @@
                     if ($checkpoint3) $completed++;
                     $progress = round(($completed / 3) * 100);
                     @endphp
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 worker-row" data-uid="{{ $uid }}"
+                        data-name="{{ $worker->owner_name ?? 'Unknown' }}">
                         <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div
@@ -124,13 +125,13 @@
                                     <i class="fas fa-user text-blue-500 text-sm"></i>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">
+                                    <div class="text-sm font-medium text-gray-900 worker-name">
                                         {{ $worker->owner_name ?? 'Unknown' }}
                                     </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900 worker-uid">
                             {{ $uid }}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -139,7 +140,8 @@
                                 <div>{{ \Carbon\Carbon::parse($checkpoint1->last_tap_in)->format('M j, Y g:i A') }}
                                 </div>
                                 <div class="text-xs text-gray-500">
-                                    {{ \Carbon\Carbon::parse($checkpoint1->last_tap_in)->diffForHumans() }}</div>
+                                    {{ \Carbon\Carbon::parse($checkpoint1->last_tap_in)->diffForHumans() }}
+                                </div>
                             </div>
                             @else
                             <span class="text-gray-400">—</span>
@@ -151,7 +153,8 @@
                                 <div>{{ \Carbon\Carbon::parse($checkpoint2->last_tap_in)->format('M j, Y g:i A') }}
                                 </div>
                                 <div class="text-xs text-gray-500">
-                                    {{ \Carbon\Carbon::parse($checkpoint2->last_tap_in)->diffForHumans() }}</div>
+                                    {{ \Carbon\Carbon::parse($checkpoint2->last_tap_in)->diffForHumans() }}
+                                </div>
                             </div>
                             @else
                             <span class="text-gray-400">—</span>
@@ -163,7 +166,8 @@
                                 <div>{{ \Carbon\Carbon::parse($checkpoint3->last_tap_in)->format('M j, Y g:i A') }}
                                 </div>
                                 <div class="text-xs text-gray-500">
-                                    {{ \Carbon\Carbon::parse($checkpoint3->last_tap_in)->diffForHumans() }}</div>
+                                    {{ \Carbon\Carbon::parse($checkpoint3->last_tap_in)->diffForHumans() }}
+                                </div>
                             </div>
                             @else
                             <span class="text-gray-400">—</span>
@@ -182,7 +186,6 @@
                                 class="text-blue-600 hover:text-blue-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <!-- Dropdown for Delete -->
                             <div class="relative inline-block text-left">
                                 <button onclick="toggleDropdown({{ $worker->id }})"
                                     class="text-red-600 hover:text-red-900">
@@ -235,7 +238,7 @@
 </div>
 
 <script>
-// WebSocket connection code remains the same as previous version
+// WebSocket connection code
 let socket;
 let retryCount = 0;
 const maxRetries = 5;
@@ -396,18 +399,55 @@ function showNotification({
     }, 5000);
 }
 
-// Search functionality
+// Search functionality - Corrected version
 document.getElementById('search-input').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('tbody tr');
+    const searchTerm = e.target.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.worker-row');
+
+    if (searchTerm === '') {
+        rows.forEach(row => {
+            row.style.display = '';
+            // Remove any highlights
+            const nameCell = row.querySelector('.worker-name');
+            const uidCell = row.querySelector('.worker-uid');
+            if (nameCell) nameCell.innerHTML = nameCell.textContent;
+            if (uidCell) uidCell.innerHTML = uidCell.textContent;
+        });
+        return;
+    }
 
     rows.forEach(row => {
-        const uid = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-        const name = row.querySelector('td:first-child .text-sm').textContent.toLowerCase();
-        const text = uid + ' ' + name;
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
+        const name = row.getAttribute('data-name').toLowerCase();
+        const uid = row.getAttribute('data-uid').toLowerCase();
+
+        // Clear previous highlights
+        const nameCell = row.querySelector('.worker-name');
+        const uidCell = row.querySelector('.worker-uid');
+        if (nameCell) nameCell.innerHTML = nameCell.textContent;
+        if (uidCell) uidCell.innerHTML = uidCell.textContent;
+
+        if (name.includes(searchTerm) || uid.includes(searchTerm)) {
+            row.style.display = '';
+            // Highlight matches
+            if (name.includes(searchTerm) && nameCell) {
+                highlightText(nameCell, searchTerm);
+            }
+            if (uid.includes(searchTerm) && uidCell) {
+                highlightText(uidCell, searchTerm);
+            }
+        } else {
+            row.style.display = 'none';
+        }
     });
 });
+
+function highlightText(element, searchText) {
+    const text = element.textContent;
+    const regex = new RegExp(searchText, 'gi');
+    element.innerHTML = text.replace(regex, match =>
+        `<span class="highlight bg-yellow-200">${match}</span>`
+    );
+}
 </script>
 
 <style>
@@ -431,6 +471,12 @@ document.getElementById('search-input').addEventListener('input', function(e) {
     to {
         opacity: 0;
     }
+}
+
+.highlight {
+    background-color: #fef08a;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.25rem;
 }
 
 .animate-fade-in-up {
