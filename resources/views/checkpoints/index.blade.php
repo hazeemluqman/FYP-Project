@@ -43,6 +43,17 @@
         </div>
     </div>
 
+    <!-- Date Filter -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-800">Daily Records</h3>
+            <div class="relative">
+                <input type="date" id="date-filter" value="{{ $date }}"
+                    class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500">
+            </div>
+        </div>
+    </div>
+
     <!-- Checkpoint Progress Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
         <div
@@ -506,6 +517,46 @@ function highlightText(element, searchText) {
         `<span class="highlight bg-yellow-200">${match}</span>`
     );
 }
+
+// Date filter functionality
+document.getElementById('date-filter').addEventListener('change', function(e) {
+    const date = e.target.value;
+    window.location.href = `{{ route('checkpoints.index') }}?date=${date}`;
+});
+
+// Update WebSocket handler to show creation/update
+socket.onmessage = async function(event) {
+    try {
+        const data = JSON.parse(event.data);
+        const uid = data.uid;
+        const checkpoint = data.checkpoint;
+
+        const response = await fetch("{{ route('checkpoints.store') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                uid,
+                checkpoint
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            const action = result.action === 'created' ? 'New daily record created' : 'Existing record updated';
+            showTapNotification(uid, `${checkpoint} (${action})`);
+            window.location.reload();
+        } else {
+            const errorText = await response.text();
+            showErrorNotification("Error saving checkpoint: " + errorText);
+        }
+    } catch (e) {
+        console.error("Error processing RFID tap:", e);
+        showErrorNotification("Error processing RFID tap");
+    }
+};
 </script>
 
 <style>
