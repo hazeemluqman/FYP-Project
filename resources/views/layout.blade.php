@@ -152,8 +152,8 @@
                         <i class="fas fa-user text-green-200"></i>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium">Admin User</p>
-                        <p class="text-xs opacity-70">admin@smartwet.com</p>
+                        <p class="text-sm font-medium">{{ Auth::user()->name }}</p>
+                        <p class="text-xs opacity-70">{{ Auth::user()->email }}</p>
                     </div>
                 </div>
                 <form action="{{ url('/logout') }}" method="POST">
