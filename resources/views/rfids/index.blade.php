@@ -60,12 +60,12 @@
                             <div class="flex justify-end space-x-2">
                                 <!-- View Details -->
                                 <a href="{{ route('rfids.show', $rfid->id) }}"
-                                    class="text-green-600 hover:text-green-900 mr-3" title="View Details">
+                                    class="text-green-600 hover:text-green-900" title="View Details">
                                     <i class="fas fa-eye"></i> Details
                                 </a>
                                 <!-- Edit -->
-                                <a href="{{ route('rfids.edit', $rfid->id) }}"
-                                    class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                                <a href="{{ route('rfids.edit', $rfid->id) }}" class="text-blue-600 hover:text-blue-900"
+                                    title="Edit">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                                 <!-- Delete -->
@@ -78,6 +78,7 @@
                                     </button>
                                 </form>
                             </div>
+
                         </td>
                     </tr>
                     @endforeach
