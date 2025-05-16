@@ -6,7 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rfid extends Model
 {
-    protected $fillable = ['owner_name', 'uid', 'phone_number'];
+    // Add the new fields to the $fillable array
+    protected $fillable = [
+        'owner_name',
+        'uid',
+        'phone_number',
+        'gender',
+        'address',
+        'birthday',
+        'emergency_contact',
+        'email',
+    ];
 
     // Relationship with Checkpoints
     public function checkpoints()

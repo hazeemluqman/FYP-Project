@@ -78,6 +78,49 @@
                 </div>
             </div>
 
+            <!-- Gender -->
+            <div>
+                <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <select id="gender" name="gender"
+                    class="block w-full p-3 border border-gray-300 rounded-lg focus:outline-none">
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+            <!-- Address -->
+            <div>
+                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <textarea id="address" name="address"
+                    class="block w-full p-3 border border-gray-300 rounded-lg focus:outline-none" rows="2"
+                    placeholder="Enter worker's home address"></textarea>
+            </div>
+
+            <!-- Birthday -->
+            <div>
+                <label for="birthday" class="block text-sm font-medium text-gray-700 mb-1">Birthday</label>
+                <input type="date" id="birthday" name="birthday"
+                    class="block w-full p-3 border border-gray-300 rounded-lg focus:outline-none">
+            </div>
+
+            <!-- Emergency Contact -->
+            <div>
+                <label for="emergency_contact" class="block text-sm font-medium text-gray-700 mb-1">Emergency
+                    Contact</label>
+                <input type="text" id="emergency_contact" name="emergency_contact"
+                    class="block w-full p-3 border border-gray-300 rounded-lg focus:outline-none"
+                    placeholder="Name and phone e.g. Ali (0199998888)">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" name="email"
+                    class="block w-full p-3 border border-gray-300 rounded-lg focus:outline-none"
+                    placeholder="worker@email.com">
+            </div>
+
             <!-- Submit Button -->
             <div class="pt-2">
                 <button type="submit"
@@ -86,6 +129,7 @@
                 </button>
             </div>
         </form>
+
     </div>
 </div>
 
