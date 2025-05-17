@@ -39,4 +39,9 @@ class Checkpoint extends Model
     {
         return $query->whereDate('tap_date', $date);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
 }

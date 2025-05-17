@@ -23,5 +23,7 @@ Route::get('/home', function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('/rfids', RfidController::class);
     Route::resource('/checkpoints', CheckpointController::class);
-    Route::resource('/activities', ActivityController::class);
+    Route::resource('/activities', ActivityController::class); 
+    Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
 });

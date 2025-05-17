@@ -130,7 +130,7 @@
                         </a>
                     </li>
                     <li class="sidebar-item {{ Request::is('reports*') ? 'active' : '' }}">
-                        <a href="{{ url('/reports') }}" class="flex items-center p-3 space-x-3">
+                        <a href="{{ route('reports.index') }}" class="flex items-center p-3 space-x-3">
                             <i class="fas fa-chart-bar w-5 text-green-200"></i>
                             <span class="flex-1">Reports</span>
                         </a>
