@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/rfids', RfidController::class);
     Route::resource('/checkpoints', CheckpointController::class);
     Route::resource('/activities', ActivityController::class); 
+    Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
     Route::get('/accounts', [App\Http\Controllers\UserAccountController::class, 'index'])->name('accounts.index');

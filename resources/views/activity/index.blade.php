@@ -1,11 +1,11 @@
 @extends('layout')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 ">
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">RFID Access Control</h1>
+            <h1 class="text-2xl font-bold text-gray-800">RFID Access Control</h1>
             <p class="text-gray-600 mt-1">Manage and monitor all registered access cards</p>
         </div>
 
@@ -71,40 +71,64 @@
         </div>
         @endif
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <!-- Filter Form -->
+            <form method="GET" action="{{ route('activity.index') }}" class="mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div class="w-full sm:w-auto">
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Filter by Date</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <input type="date" id="date" name="date" value="{{ $date }}"
+                                class="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 border">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 sm:self-end">
+                        <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Apply Filter
+                        </button>
+                        <a href="{{ route('activity.index') }}"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Reset Date
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Table -->
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Card Details
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Status
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Last Activity
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Checkpoints
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="cards-table-body">
                     @foreach ($rfids as $rfid)
-                    <tr class="hover:bg-gray-50 transition-colors duration-150 group" data-uid="{{ $rfid->uid }}"
+                    <tr class="hover:bg-blue-50 transition-colors duration-150" data-uid="{{ $rfid->uid }}"
                         data-name="{{ $rfid->owner_name }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div
-                                    class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-150">
+                                    class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -113,29 +137,33 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="font-mono text-sm font-medium text-gray-900 card-uid flex items-center">
+                                    <div class="font-mono text-sm font-medium text-gray-900 flex items-center">
                                         {{ $rfid->uid }}
                                         <span class="ml-2 text-xs font-normal text-gray-400">ID: {{ $rfid->id }}</span>
                                     </div>
-                                    <div class="text-sm text-gray-500 card-name">{{ $rfid->owner_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $rfid->owner_name }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($rfid->checkpoints && $rfid->checkpoints->count() > 0)
-                            @php
-                            $lastActivity =
-                            \Carbon\Carbon::parse($rfid->checkpoints->sortByDesc('last_tap_in')->first()->last_tap_in);
-                            $isActive = $lastActivity->diffInHours(now()) < 24; @endphp <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $isActive ? 'Active' : 'Inactive' }}
-                                </span>
-                                @else
-                                <span
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                    Never Used
-                                </span>
-                                @endif
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor"
+                                    viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Active
+                            </span>
+                            @else
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-gray-400" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Inactive
+                            </span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($rfid->checkpoints && $rfid->checkpoints->count() > 0)
@@ -152,19 +180,13 @@
                         <td class="px-6 py-4">
                             @if($rfid->checkpoints && $rfid->checkpoints->count() > 0)
                             <div class="flex flex-wrap gap-1.5 max-w-xs">
-                                @foreach($rfid->checkpoints->sortByDesc('last_tap_in')->take(3) as $checkpoint)
+                                @foreach($rfid->checkpoints as $checkpoint)
                                 <span
                                     class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                     {{ $checkpoint->checkpoint }}
                                     <span class="ml-1 text-green-600">{{ $checkpoint->access_count }}</span>
                                 </span>
                                 @endforeach
-                                @if($rfid->checkpoints->count() > 3)
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                    +{{ $rfid->checkpoints->count() - 3 }} more
-                                </span>
-                                @endif
                             </div>
                             @else
                             <span class="text-sm text-gray-400">No checkpoints</span>
@@ -172,7 +194,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <a href="{{ route('rfids.show', $rfid->id) }}"
-                                class="text-blue-600 hover:text-blue-900 mr-3 inline-flex items-center">
+                                class="text-blue-600 hover:text-blue-900 inline-flex items-center">
                                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>

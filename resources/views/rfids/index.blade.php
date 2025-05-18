@@ -1,10 +1,10 @@
 @extends('layout')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="container mx-auto px-4 ">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">RFID Card Management</h1>
+            <h1 class="text-2xl font-bold text-gray-800">RFID Card Management</h1>
             <p class="text-gray-600 mt-1">Manage all assigned RFID cards and worker information</p>
         </div>
 

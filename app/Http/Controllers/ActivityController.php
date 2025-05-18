@@ -11,13 +11,15 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch all RFID records (replace with your actual logic)
-        $rfids = Rfid::all(); // Assuming you have an Rfid model
+        $date = $request->input('date', now()->toDateString());
 
-        // Pass the $rfids variable to the view
-        return view('activity.index', compact('rfids'));
+        $rfids = Rfid::with(['checkpoints' => function($query) use ($date) {
+            $query->whereDate('last_tap_in', $date);
+        }])->get();
+
+        return view('activity.index', compact('rfids', 'date'));
     }
 
     /**
