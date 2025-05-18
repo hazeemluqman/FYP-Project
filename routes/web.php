@@ -26,4 +26,5 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/activities', ActivityController::class); 
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
+    Route::get('/accounts', [App\Http\Controllers\UserAccountController::class, 'index'])->name('accounts.index');
 });

@@ -135,10 +135,10 @@
                             <span class="flex-1">Reports</span>
                         </a>
                     </li>
-                    <li class="sidebar-item {{ Request::is('settings*') ? 'active' : '' }}">
-                        <a href="{{ url('/settings') }}" class="flex items-center p-3 space-x-3">
-                            <i class="fas fa-cog w-5 text-green-200"></i>
-                            <span class="flex-1">Settings</span>
+                    <li class="sidebar-item {{ Request::is('accounts*') ? 'active' : '' }}">
+                        <a href="{{ route('accounts.index') }}" class="flex items-center p-3 space-x-3">
+                            <i class="fas fa-address-book w-5 text-green-200"></i>
+                            <span class="flex-1">User Accounts</span>
                         </a>
                     </li>
                 </ul>

@@ -81,6 +81,22 @@
                         @enderror
                     </div>
 
+                    <!-- Phone Number Field -->
+                    <div class="mb-5">
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number
+                        </label>
+                        <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 @error('phone') border-red-500 @enderror"
+                            required autocomplete="phone">
+
+                        @error('phone')
+                        <span class="text-sm text-red-600 mt-1 block">
+                            {{ $message }}
+                        </span>
+                        @enderror
+                    </div>
+
                     <!-- Password Field -->
                     <div class="mb-5">
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
