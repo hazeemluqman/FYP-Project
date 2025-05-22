@@ -13,8 +13,12 @@
 
     <!-- Profile Card -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-        <div class="px-6 py-4" style="background-color: #5A6C57;">
+        <div class="px-6 py-4 flex justify-between items-center" style="background-color: #5A6C57;">
             <h2 class="text-xl font-semibold text-white">My Profile</h2>
+            <a href="{{ route('profile.edit', $user->id) }}"
+                class="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100 transition duration-200">
+                <i class="fas fa-edit mr-2"></i>Edit Profile
+            </a>
         </div>
 
         <div class="p-6">
@@ -59,11 +63,7 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
-
-
 </div>
 @endsection
