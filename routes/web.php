@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RfidController;
 use App\Http\Controllers\CheckpointController;
@@ -28,4 +29,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
     Route::get('/accounts', [App\Http\Controllers\UserAccountController::class, 'index'])->name('accounts.index');
+    Route::resource('/profile', ProfileController::class); 
 });

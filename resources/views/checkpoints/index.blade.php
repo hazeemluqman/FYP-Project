@@ -10,14 +10,7 @@
         </h1>
         <p class="text-gray-600">Live tracking • {{ date('l, F j, Y') }}</p>
     </div>
-    <div class="flex items-center space-x-3">
-        <div class="relative" x-data="{ open: false }" @click.away="open = false">
-            <button @click="open = !open" class="relative p-1 text-gray-500 hover:text-green-600">
-                <i class="fas fa-bell text-xl"></i>
-                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
-        </div>
-    </div>
+
 </div>
 
 <div class="container mx-auto px-4">

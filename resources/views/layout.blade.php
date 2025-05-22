@@ -146,7 +146,7 @@
 
             <!-- User Profile & Logout -->
             <div class="p-4 border-t border-white border-opacity-10">
-                <div
+                <a href="{{ route('profile.index') }}"
                     class="flex items-center mb-4 p-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer smooth-transition">
                     <div class="h-10 w-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
                         <i class="fas fa-user text-green-200"></i>
@@ -155,7 +155,7 @@
                         <p class="text-sm font-medium">{{ Auth::user()->name }}</p>
                         <p class="text-xs opacity-70">{{ Auth::user()->email }}</p>
                     </div>
-                </div>
+                </a>
                 <form action="{{ url('/logout') }}" method="POST">
                     @csrf
                     <button type="submit"
