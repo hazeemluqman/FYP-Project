@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserAccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RfidController;
 use App\Http\Controllers\CheckpointController;
@@ -25,9 +26,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/rfids', RfidController::class);
     Route::resource('/checkpoints', CheckpointController::class);
     Route::resource('/activities', ActivityController::class); 
-    Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+    Route::resource('/profile', ProfileController::class); 
+    Route::resource('/accounts', UserAccountController::class); 
+    Route::resource('/activity', ActivityController::class);
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
-    Route::get('/accounts', [App\Http\Controllers\UserAccountController::class, 'index'])->name('accounts.index');
-    Route::resource('/profile', ProfileController::class); 
+    Route::put('/users/{user}/role', [UserAccountController::class, 'updateRole'])->name('users.updateRole');
 });

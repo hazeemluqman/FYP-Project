@@ -182,12 +182,12 @@
 
     <!-- Notification Toast -->
     <div id="notification-toast"
-        class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl flex items-center space-x-3 z-50 max-w-xs">
+        class="fixed bottom-4 right-4 hidden bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl items-center space-x-3 z-50 max-w-xs">
         <div class="h-6 w-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
             <i class="fas fa-check text-sm"></i>
         </div>
         <div class="flex-1 min-w-0">
-            <span id="notification-message" class="truncate">Operation successful</span>
+            <span id="notification-message" class="truncate"></span>
         </div>
         <button onclick="hideNotification()" class="ml-4 opacity-70 hover:opacity-100 flex-shrink-0">
             <i class="fas fa-times"></i>
@@ -233,7 +233,7 @@
 
         // Reset classes
         toast.className =
-            `fixed bottom-4 right-4 hidden ${bg} text-white px-6 py-3 rounded-lg shadow-xl flex items-center space-x-3 z-50 max-w-xs`;
+            `fixed bottom-4 right-4 ${bg} text-white px-6 py-3 rounded-lg shadow-xl flex items-center space-x-3 z-50 max-w-xs`;
 
         // Update content
         iconEl.className = `fas ${icon} text-sm`;
@@ -257,10 +257,6 @@
             toast.style.animation = '';
         }, 300);
     }
-
-    // Example usage:
-    // showNotification('Worker check-in recorded successfully', 'success');
-    // showNotification('Failed to save data', 'error');
     </script>
 </body>
 
