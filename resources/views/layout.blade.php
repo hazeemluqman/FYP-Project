@@ -109,6 +109,9 @@
                 <p class="text-xs opacity-80 mt-1 text-green-100">Plantation Workforce Tracking</p>
             </div>
 
+            @php
+            $role = Auth::user()->role ?? '';
+            @endphp
             <nav class="flex-1 overflow-y-auto sidebar-scroll">
                 <ul class="space-y-1 px-2">
                     <li class="sidebar-item {{ Request::is('checkpoints*') ? 'active' : '' }}">
@@ -123,6 +126,7 @@
                             <span class="flex-1">Worker Activity</span>
                         </a>
                     </li>
+                    @if(in_array($role, ['admin', 'manager']))
                     <li class="sidebar-item {{ Request::is('rfids*') ? 'active' : '' }}">
                         <a href="{{ url('/rfids') }}" class="flex items-center p-3 space-x-3">
                             <i class="fas fa-users w-5 text-green-200"></i>
@@ -141,6 +145,7 @@
                             <span class="flex-1">User Accounts</span>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </nav>
 
