@@ -38,6 +38,7 @@
             </div>
 
             <!-- Role Input -->
+            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
             <div class="mb-6">
                 <label for="role" class="block text-sm font-medium text-gray-700">Role:</label>
                 <select name="role" id="role" class="mt-1 block w-full rounded-lg border border-gray-300 p-2">
@@ -45,10 +46,15 @@
                     </option>
                     <option value="worker" {{ old('role', $user->role) == 'worker' ? 'selected' : '' }}>Worker</option>
                 </select>
-                @error('role')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+
             </div>
+            @else
+            <div class="mb-6">
+                <label for="role" class="block text-sm font-medium text-gray-700">Role:</label>
+                <input type="text" name="role" id="role" value="{{ $user->role }}"
+                    class="mt-1 block w-full rounded-lg border border-gray-300 p-2 bg-gray-100" readonly>
+            </div>
+            @endif
 
             <!-- Buttons -->
             <div class="flex justify-end space-x-3">

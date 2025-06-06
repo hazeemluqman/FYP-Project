@@ -90,10 +90,12 @@
                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Progress
                         </th>
+                        @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'manager'))
                         <th scope="col"
                             class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                         </th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="workers-table-body">
@@ -185,88 +187,89 @@
                                 <span class="text-xs font-medium">{{ $progress }}%</span>
                             </div>
                         </td>
+                        @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'manager'))
                         <td class="px-4 py-3 whitespace-nowrap text-sm  flex items-center space-x-2">
                             <!-- Edit Dropdown -->
-                            <div class="relative inline-block text-left">
-                                <button onclick="toggleEditDropdown({{ $worker->id }})"
-                                    class="text-blue-600 hover:text-blue-900">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <div id="edit-dropdown-{{ $worker->id }}"
-                                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
-                                    <div class="py-1">
-                                        @if($checkpoint1)
-                                        <a href="{{ route('checkpoints.edit', $checkpoint1->id) }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
-                                            Edit Checkpoint 1
-                                        </a>
-                                        @endif
-                                        @if($checkpoint2)
-                                        <a href="{{ route('checkpoints.edit', $checkpoint2->id) }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
-                                            Edit Checkpoint 2
-                                        </a>
-                                        @endif
-                                        @if($checkpoint3)
-                                        <a href="{{ route('checkpoints.edit', $checkpoint3->id) }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
-                                            Edit Checkpoint 3
-                                        </a>
-                                        @endif
-                                    </div>
+                            <div class="relative inline-block text-left"></div>
+                            <button onclick="toggleEditDropdown({{ $worker->id }})"
+                                class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div id="edit-dropdown-{{ $worker->id }}"
+                                class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                                <div class="py-1">
+                                    @if($checkpoint1)
+                                    <a href="{{ route('checkpoints.edit', $checkpoint1->id) }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                        Edit Checkpoint 1
+                                    </a>
+                                    @endif
+                                    @if($checkpoint2)
+                                    <a href="{{ route('checkpoints.edit', $checkpoint2->id) }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                        Edit Checkpoint 2
+                                    </a>
+                                    @endif
+                                    @if($checkpoint3)
+                                    <a href="{{ route('checkpoints.edit', $checkpoint3->id) }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                                        Edit Checkpoint 3
+                                    </a>
+                                    @endif
                                 </div>
                             </div>
+        </div>
 
-                            <!-- Delete Dropdown -->
-                            <div class="relative inline-block text-left">
-                                <button onclick="toggleDeleteDropdown({{ $worker->id }})"
-                                    class="text-red-600 hover:text-red-900">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                                <div id="delete-dropdown-{{ $worker->id }}"
-                                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
-                                    <div class="py-1">
-                                        @if($checkpoint1)
-                                        <button onclick="deleteCheckpoint({{ $checkpoint1->id }})"
-                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
-                                            Delete Checkpoint 1
-                                        </button>
-                                        @endif
-                                        @if($checkpoint2)
-                                        <button onclick="deleteCheckpoint({{ $checkpoint2->id }})"
-                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
-                                            Delete Checkpoint 2
-                                        </button>
-                                        @endif
-                                        @if($checkpoint3)
-                                        <button onclick="deleteCheckpoint({{ $checkpoint3->id }})"
-                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
-                                            Delete Checkpoint 3
-                                        </button>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
+        <!-- Delete Dropdown -->
+        <div class="relative inline-block text-left">
+            <button onclick="toggleDeleteDropdown({{ $worker->id }})" class="text-red-600 hover:text-red-900">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <div id="delete-dropdown-{{ $worker->id }}"
+                class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-10">
+                <div class="py-1">
+                    @if($checkpoint1)
+                    <button onclick="deleteCheckpoint({{ $checkpoint1->id }})"
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
+                        Delete Checkpoint 1
+                    </button>
                     @endif
-                </tbody>
-            </table>
+                    @if($checkpoint2)
+                    <button onclick="deleteCheckpoint({{ $checkpoint2->id }})"
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
+                        Delete Checkpoint 2
+                    </button>
+                    @endif
+                    @if($checkpoint3)
+                    <button onclick="deleteCheckpoint({{ $checkpoint3->id }})"
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50">
+                        Delete Checkpoint 3
+                    </button>
+                    @endif
+                </div>
+            </div>
         </div>
+        </td>
+        @endif
+        </td>
+        </tr>
+        @endforeach
+        @endif
+        </tbody>
+        </table>
     </div>
+</div>
 
-    <!-- System Status -->
-    <div class="bg-white rounded-lg shadow p-3 flex items-center justify-between">
-        <div class="flex items-center">
-            <span id="connection-indicator" class="h-3 w-3 rounded-full bg-gray-400 mr-3 animate-pulse"></span>
-            <span id="connection-status" class="text-sm text-gray-600">Connecting to WebSocket...</span>
-        </div>
-        <button onclick="window.location.reload()"
-            class="text-sm text-green-600 hover:text-green-800 flex items-center">
-            <i class="fas fa-sync-alt mr-1"></i> Refresh
-        </button>
+<!-- System Status -->
+<div class="bg-white rounded-lg shadow p-3 flex items-center justify-between">
+    <div class="flex items-center">
+        <span id="connection-indicator" class="h-3 w-3 rounded-full bg-gray-400 mr-3 animate-pulse"></span>
+        <span id="connection-status" class="text-sm text-gray-600">Connecting to WebSocket...</span>
     </div>
+    <button onclick="window.location.reload()" class="text-sm text-green-600 hover:text-green-800 flex items-center">
+        <i class="fas fa-sync-alt mr-1"></i> Refresh
+    </button>
+</div>
 </div>
 
 <script>
