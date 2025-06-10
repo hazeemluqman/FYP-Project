@@ -115,10 +115,12 @@
                             class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Checkpoints
                         </th>
+                        @if(auth()->user()->role !== 'worker')
                         <th scope="col"
                             class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                             Actions
                         </th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="cards-table-body">
@@ -192,6 +194,7 @@
                             <span class="text-sm text-gray-400">No checkpoints</span>
                             @endif
                         </td>
+                        @if(auth()->user()->role !== 'worker')
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <a href="{{ route('rfids.show', $rfid->id) }}"
                                 class="text-blue-600 hover:text-blue-900 inline-flex items-center">
@@ -205,6 +208,7 @@
                                 View
                             </a>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>

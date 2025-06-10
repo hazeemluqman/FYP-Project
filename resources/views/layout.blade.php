@@ -181,7 +181,7 @@
 
         <!-- Footer -->
         <div class="text-center text-sm text-gray-500 py-4 border-t border-gray-200">
-            <p>© {{ date('Y') }} SMART-WET System. All rights reserved. v1.2.0</p>
+            <p>© {{ date('Y') }} SMART-WET System. All rights reserved. v1.0.0</p>
         </div>
     </div>
 
