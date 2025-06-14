@@ -145,6 +145,12 @@
                             <span class="flex-1">User Accounts</span>
                         </a>
                     </li>
+                    <li class="sidebar-item {{ Request::is('about') ? 'active' : '' }}">
+                        <a href="{{ route('about') }}" class="flex items-center p-3 space-x-3">
+                            <i class="fas fa-info-circle w-5 text-green-200"></i>
+                            <span class="flex-1">About System</span>
+                        </a>
+                    </li>
                     @endif
                 </ul>
             </nav>

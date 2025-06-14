@@ -32,4 +32,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/download', [App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.download');
     Route::put('/users/{user}/role', [UserAccountController::class, 'updateRole'])->name('users.updateRole');
+    Route::view('/about', 'about.about')->name('about');
 });

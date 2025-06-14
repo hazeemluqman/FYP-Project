@@ -11,11 +11,18 @@ class RfidController extends Controller
     // ============================
     // 1. Show All Workers (List)
     // ============================
-    public function index()
+    public function index(Request $request)
     {
-        $rfids = Rfid::all();
-        return view('rfids.index', compact('rfids'));
-    }
+    $search = $request->input('search');
+    $rfids = Rfid::query()
+        ->when($search, function ($query, $search) {
+            $query->where('uid', 'like', "%{$search}%")
+                  ->orWhere('owner_name', 'like', "%{$search}%");
+        })
+        ->get();
+
+    return view('rfids.index', compact('rfids'));
+}
 
     // ============================
     // 2. Show Add Worker Form

@@ -30,8 +30,6 @@ public function login(Request $request)
 }
 
     
-
-
     // Show Register Page
     public function showRegisterForm()
     {

@@ -10,27 +10,27 @@ class ReportController extends Controller
 {
     // Show the report page
     public function index(Request $request)
-{
-    $date = $request->input('date');
-    $name = $request->input('name');
-    $checkpoint = $request->input('checkpoint');
+    {
+        $date = $request->input('date');
+        $name = $request->input('name');
+        $checkpoint = $request->input('checkpoint');
 
-    $query = Checkpoint::latest();
+        $query = Checkpoint::latest();
 
-    if ($date) {
-        $query->whereDate('last_tap_in', $date);
-    }
-    if ($name) {
-        $query->where('owner_name', 'like', '%' . $name . '%');
-    }
-    if ($checkpoint) {
-        $query->where('checkpoint', 'like', '%' . $checkpoint . '%');
-    }
+        if ($date) {
+            $query->whereDate('last_tap_in', $date);
+        }
+        if ($name) {
+            $query->where('owner_name', 'like', '%' . $name . '%');
+        }
+        if ($checkpoint) {
+            $query->where('checkpoint', 'like', '%' . $checkpoint . '%');
+        }
 
-    $activities = $query->get();
-    $checkpoints = Checkpoint::select('checkpoint')->distinct()->pluck('checkpoint');
-    return view('reports.index', compact('activities', 'date', 'name', 'checkpoint', 'checkpoints'));
-}
+        $activities = $query->get();
+        $checkpoints = Checkpoint::select('checkpoint')->distinct()->pluck('checkpoint');
+        return view('reports.index', compact('activities', 'date', 'name', 'checkpoint', 'checkpoints'));
+    }
 
 public function downloadPdf(Request $request)
 {

@@ -15,6 +15,20 @@
         </a>
     </div>
 
+    <!-- Search Form -->
+    <form method="GET" action="{{ route('rfids.index') }}" class="mb-6">
+        <div class="flex flex-col md:flex-row md:items-center gap-2">
+            <input type="text" name="search" value="{{ request('search') }}"
+                class="w-full md:w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+                placeholder="Search by UID or Worker Name">
+            <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200">
+                <i class="fas fa-search mr-1"></i> Search
+            </button>
+        </div>
+    </form>
+    <!-- End Search Form -->
+
     @if ($rfids->isEmpty())
     <div class="bg-white rounded-xl shadow-sm p-8 text-center">
         <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
